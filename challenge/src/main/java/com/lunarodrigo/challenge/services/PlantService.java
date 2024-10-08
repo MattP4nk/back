@@ -1,5 +1,6 @@
 package com.lunarodrigo.challenge.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -119,26 +120,30 @@ public class PlantService {
 
     public ResponseDTO updateValues(String target) throws NotFoundException {
         if ("all".equals(target)) {
+            List<PlantModel> plantModels = new ArrayList<>();
             try {
                 List<SensorModel> sensors = sensorRepository.findAll();
                 for (SensorModel sensor : sensors) {
+                    PlantModel plant = sensor.getPlant();
                     sensor.setValue(getNewValue());
                     switch (sensor.getValue()) {
+
                         case "OK" -> {
                             sensor.setTotalReadings(sensor.getTotalReadings() + 1);
-                            sensor.getPlant().setTotalReadings(sensor.getPlant().getTotalReadings() + 1);
+                            plant.setTotalReadings(plant.getTotalReadings() + 1);
                         }
                         case "Warning" -> {
                             sensor.setTotalWarnings(sensor.getTotalWarnings() + 1);
-                            sensor.getPlant().setTotalWarnings(sensor.getPlant().getTotalWarnings() + 1);
+                            plant.setTotalWarnings(plant.getTotalWarnings() + 1);
                         }
                         case "Danger" -> {
                             sensor.setTotalRedAlerts(sensor.getTotalRedAlerts() + 1);
-                            sensor.getPlant().setTotalRedAlerts(sensor.getPlant().getTotalRedAlerts() + 1);
+                            plant.setTotalRedAlerts(plant.getTotalRedAlerts() + 1);
                         }
                     }
-                    plantRepository.save(sensor.getPlant());
+                    plantModels.add(plant);
                 }
+                plantRepository.saveAll(plantModels);
                 sensorRepository.saveAll(sensors);
                 responseDTO.setStatus("OK");
                 responseDTO.setPack(plantRepository.findAll());

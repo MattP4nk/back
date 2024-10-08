@@ -67,12 +67,15 @@ public class JWTService {
         try {
             String username = userFromJWT(token);
             if (username == null) {
+                System.out.println("Username null");
                 throw new MalformedJwtException("Not a valid Token");
             }
             UserModel user = userRepository.findByUsername(username);
             if (user == null) {
+                System.out.println("User not found");
                 throw new UsernameNotFoundException("User not found");
             }
+            System.out.println("returning true");
             return true;
         } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException
                 | IllegalArgumentException e) {
