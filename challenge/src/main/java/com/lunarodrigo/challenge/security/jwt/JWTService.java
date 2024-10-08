@@ -65,7 +65,14 @@ public class JWTService {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
+            String username = userFromJWT(token);
+            if (username == null) {
+                throw new MalformedJwtException("Not a valid Token");
+            }
+            UserModel user = userRepository.findByUsername(username);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found");
+            }
             return true;
         } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException
                 | IllegalArgumentException e) {
