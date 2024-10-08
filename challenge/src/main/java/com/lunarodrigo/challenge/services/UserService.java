@@ -107,6 +107,12 @@ public class UserService {
         return response;
     }
 
+    /**
+     * Este metodo vuelve a un user en un admin. -Le da chamba-
+     * 
+     * @param target (user username)
+     * @return responseDTO
+     */
     public ResponseDTO upgradeUser(String target) {
         try {
             UserModel user = userRepository.findByUsername(target);
@@ -126,6 +132,12 @@ public class UserService {
         return response;
     }
 
+    /**
+     * Este metodo le quita la chamba a un admin.
+     * 
+     * @param target (Admin username)
+     * @return responseDTO
+     */
     public ResponseDTO downgradeAdmin(String target) {
         try {
             UserModel admin = userRepository.findByUsername(target);

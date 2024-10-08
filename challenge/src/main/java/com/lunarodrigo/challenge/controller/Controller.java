@@ -38,11 +38,37 @@ public class Controller {
         return "Readme!? I haven't written it yet!";
     }
 
+    /**
+     * Esta parte del codigo puede parecer la mas complicada (al ser el global
+     * entrypoint de la app). Pero en realidad es bastante simple. Recibe el request
+     * en formato JSON y valida que servicios y metodos debe llamar asi como
+     * solicitar la validacion de permisos para acceder a estos. Separe la app en
+     * tres categorias /usuarios/plantas y sensores/logs. Aun siendo dos modelos
+     * diferentes (plantas y sensores) los manejo dentro de un unico servicio ya que
+     * no hay uno sin el otro por como plantee su funcionamiento.
+     * 
+     * @param requestDTO En este JSON viene todo lo que necesita la app para saber
+     *                   que hacer. Incluyendo el "key" (jwt token) para validar en
+     *                   caso de llamar a un metodo protegido.
+     * @return Devolvemos un responseDTO como un ResponseEntity (para el
+     *         http.status.), de esta manera podemos explicar al usuario sobre
+     *         posibles errores o problemas con su request.
+     */
     @PostMapping()
     public ResponseEntity Communications(@RequestBody RequestDTO requestDTO) {
 
+        /**
+         * willLog es el "validador" para saber si esta accion va a ser guardada en el
+         * historial de cambios.
+         */
         boolean willLog = false;
         ResponseDTO responseDTO = new ResponseDTO();
+        /**
+         * El Switch area valida a que servicio se tiene que comunicar.
+         * El Switch command verifica que metodo se debe llamar.
+         * Los metodos protegidos se validan con el metodo validateToken o
+         * validateAdminToken segun sea el caso.
+         */
         switch (requestDTO.getArea()) {
             case "users" -> {
                 switch (requestDTO.getCommand()) {
@@ -174,6 +200,11 @@ public class Controller {
                 responseDTO.setStatus("BAD REQUEST. Invalid Area");
             }
         }
+        /**
+         * Validamos si se pudieron realizar las solicitudes y devolvemos un response
+         * segun el caso.
+         * Solo vamos a guardar en sistema cuando las acciones se hayan podido realizar.
+         */
         if (responseDTO.getStatus().equals("OK")) {
             if (willLog) {
                 String targetName;
